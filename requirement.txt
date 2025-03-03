@@ -1,7 +1,7 @@
-fastapi==0.70.0
-uvicorn==0.15.0
-pydantic==1.8.2
-sentence-transformers==2.1.0
-scikit-learn==0.24.2
-numpy==1.21.2
-pypinyin==0.42.0
+fastapi==0.115.6
+uvicorn==0.34.0
+pydantic==2.10.4
+sentence-transformers==3.3.0
+scikit-learn==1.5.2
+numpy==1.25.2
+pypinyin==0.53.0
