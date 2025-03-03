@@ -29,16 +29,11 @@ python recommendSystem.py
 {
     "userModel": {
         "游戏": 3.0,
-<<<<<<< HEAD
         "音乐": 1.0,    //与keyWords二选一
-=======
-        "音乐": 1.0,    //与keyWords二选一
->>>>>>> 617a7cf (实现了关键词推荐和用户模型推荐)
         "电影": 2.0
     },
     "videos": {
         "视频1": ["游戏", "竞技"],
-<<<<<<< HEAD
         "视频2": ["音乐", "演唱"],  //必要数据
         "视频3": ["电影", "剧情"]
     },
@@ -46,14 +41,5 @@ python recommendSystem.py
     "favoriteVideos": ["视频5"], //可选数据
     "recommend_count": 5,   //可选数据，默认为5
     "keyWords": ["游戏"]    //与userModel二选一
-=======
-        "视频2": ["音乐", "演唱"],  //必要数据
-        "视频3": ["电影", "剧情"]
-    },
-    "likeVideos": ["视频4"], //可选数据
-    "favoriteVideos": ["视频5"], //可选数据
-    "recommend_count": 5,   //可选数据，默认为5
-    "keyWords": ["游戏"]    //与userModel二选一
->>>>>>> 617a7cf (实现了关键词推荐和用户模型推荐)
 }
 ```
