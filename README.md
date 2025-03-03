@@ -23,7 +23,7 @@ python recommendSystem.py
 
 ### 2. 使用接口
 
-向 /recommend/ 端点发送 POST 请求，数据格式如下：
+向 localhost:8000/recommend/ url发送 POST 请求，数据格式如下：
 
 ```json
 {
