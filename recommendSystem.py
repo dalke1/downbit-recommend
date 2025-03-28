@@ -261,6 +261,90 @@ async def recommend(data: userData):
         logger.error(f"推荐过程出错: {str(e)}")
         return {"status": "error", "message": str(e)}
 
+
+# 添加新的请求模型类
+class RelatedReqDto(BaseModel):
+    videoTitle: str
+    tags: List[str]
+    videos: Dict[str, List[str]]
+
+# 修改 related 接口实现
+@app.post("/related/")
+async def related(data: RelatedReqDto):
+    try:
+        start_time = time.perf_counter()
+        logger.info(f"开始计算视频 '{data.videoTitle}' 的相似视频...")
+
+        # 1. 获取目标视频的向量表示
+        target_title_embedding = get_embedding(data.videoTitle)
+        target_tags_embeddings = get_embeddings(data.tags)
+        target_tags_avg_embedding = np.mean(target_tags_embeddings, axis=0)
+
+        # 2. 计算其他视频的相似度
+        similarities = {}
+        for video_name, tags in data.videos.items():
+
+            # 获取当前视频的标题和标签向量
+            current_title_embedding = get_embedding(video_name)
+            current_tags_embeddings = get_embeddings(tags)
+            current_tags_avg_embedding = np.mean(current_tags_embeddings, axis=0)
+
+            # 计算标题相似度
+            title_similarity = cosine_similarity(
+                [target_title_embedding], 
+                [current_title_embedding]
+            )[0][0]
+
+            # 计算标签相似度
+            tags_similarity = cosine_similarity(
+                [target_tags_avg_embedding], 
+                [current_tags_avg_embedding]
+            )[0][0]
+
+            # 混合相似度计算 (标题权重0.6，标签权重0.4)
+            TITLE_WEIGHT = 0.6
+            TAGS_WEIGHT = 0.4
+            final_similarity = (
+                title_similarity * TITLE_WEIGHT + 
+                tags_similarity * TAGS_WEIGHT
+            )
+
+            similarities[video_name] = final_similarity
+
+        # 3. 获取排序后的相似视频
+        SIMILARITY_THRESHOLD = 0.4  # 40% 相似度阈值
+        similar_videos = sorted(
+            [
+                (video_name, score) 
+                for video_name, score in similarities.items() 
+                if score >= SIMILARITY_THRESHOLD
+            ],
+            key=lambda x: x[1],
+            reverse=True
+        )
+
+        # 计算处理时间
+        process_time = round((time.perf_counter() - start_time) * 1000, 2)
+        logger.info(f"相似视频计算耗时: {process_time} 毫秒")
+        logger.info(f"计算完成，找到{len(similar_videos)}个相似视频")
+        logger.info("相似视频列表:")
+        for video_title, score in similar_videos:
+            logger.info(f"{video_title}: {score}")
+
+        return {
+            "recommendations": [
+                {
+                    "video_title": video_title,
+                    "score": round(float(score) * 100, 2)
+                } 
+                for video_title, score in similar_videos
+            ]
+        }
+
+    except Exception as e:
+        logger.error(f"计算相似视频时出错: {str(e)}")
+        return {"status": "error", "message": str(e)}
+
 if __name__ == "__main__":
     import uvicorn
     logger.info("开始启动服务...")
